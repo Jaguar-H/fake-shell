@@ -3,35 +3,29 @@ import { commands } from "./help.js";
 
 const path = [];
 
-const getNode = () => path.reduce((node, curr) => node[curr], fs);
+const getNode = () => path.reduce((node, key) => node[key], fs);
+const isDir = (x) => x && typeof x === "object" && !Array.isArray(x);
+const isFunction = (x) => typeof x === "function";
 
-const isDir = (dir) => typeof dir === "object" && !Array.isArray(dir);
- 
-const isFunction = (x) => typeof x === "function"
+export const cd = (name) => {
+  if (name === "..") return path.pop();
 
-export const cd = (dir) => {
   const cur = getNode();
+  const next = cur[name];
 
-  if (dir === "..") {
-    path.pop();
+  if (!isDir(next) || isFunction(next)) {
+    console.log("no such directory");
     return;
   }
-  if (!cur[dir] || !isDir(cur[dir])|| isFunction(cur[dir])) {
-    return console.log("no such directory");
-  }
-  path.push(dir);
+
+  path.push(name);
 };
 
-
-export const run = (func)=>{
-  const curr = getNode()
-  if (isFunction(curr[func])){
-    curr[func]();
-    return 
-  }
-
-  console.log(func," is not a function to run "); 
-}
+export const run = (func) => {
+  const node = getNode()[func];
+  if (isFunction(node)) return node();
+  console.log(func, "is not a function to run");
+};
 
 export const mkdir = (name) => {
   const cur = getNode();
@@ -41,74 +35,48 @@ export const mkdir = (name) => {
 
 export const mkfile = (name) => {
   const cur = getNode();
-  if (cur[name]) {
-    return console.log("\n\n", name, " already exists");
-  }
-  const data = [];
-  console.log("\n\n>@end< to end the file\n");
+  if (cur[name]) return console.log(`\n\n${name} already exists`);
 
+  console.log("\n\n>@end< to end the file\n");
+  const lines = [];
   while (true) {
     const line = prompt("- ");
     if (line === "@end") break;
-    data.push(line);
+    lines.push(line);
   }
-  getNode()[name] = data.join("\n");
+
+  cur[name] = lines.join("\n");
 };
 
 export const ls = () => {
   const cur = getNode();
   if (!isDir(cur)) return console.log("not a directory");
-
   console.log("\n\n", Object.keys(cur).join("       "));
 };
 
-
-export const mpwd = () => {
-  return "/" + path.join("/")}
-
-export const pwd = () => {
-  console.log(mpwd());
-}
+export const mpwd = () => "/" + path.join("/");
+export const pwd = () => console.log(mpwd());
 
 
-export const cat = (filename) => {
-  const curr = getNode()
-
-  if (!isDir(curr[filename]) && !isFunction(curr[filename])) {
-    console.log("\n\n",curr[filename]);
-    return;
-  }
-  console.log(`${filename} is not a file`);
-  return;
+export const cat = (name) => {
+  const file = getNode()[name];
+  if (typeof file === "string") return console.log("\n\n" + file);
+  console.log(`${name} is not a file`);
 };
-
 
 export const help = (cmd = "") => {
-  if (cmd.length === 0) {
-    console.log("The Available commands are :");
-    for (const cmnd in commands) {
-      console.log(`\n\t${cmnd} : ${commands[cmnd]}\n`);
-    }
+  if (!cmd) {
+    console.log("The Available commands are:");
+    for (const c in commands) console.log(`\n\t${c} : ${commands[c]}\n`);
     return;
   }
-  
-  if (commands[cmd]) {
-    console.log(`\n\t${cmd} : ${commands[cmd]}\n`);
-    return;
-  }
-
-  console.log("\n no help available for this command \n");
+  if (!commands[cmd]) return console.log("\n no help available for this command \n");
+  console.log(`\n\t${cmd} : ${commands[cmd]}\n`);
 };
 
-export const rm = (dirName) => {
-  const data = getNode();
-  
-  if (data[dirName]) {
-    delete (data[dirName]);
-    console.log(dirName, "\n succesFully deleted\n");
-    return;
-  }
-  console.log("file not found");
+export const rm = (name) => {
+  const curr = getNode();
+  if (!curr[name]) return console.log("file not found");
+  delete curr[name];
+  console.log(name, "\n succesFully deleted\n");
 };
-
-

@@ -1,11 +1,8 @@
-wr file
-if (!isDir(getnode()[file])){
-  const data = [];
-  while (true && data[0] !== /@end){
-  line = promt()
-  data.shift(line)}
-  data.slice(1)
-  
-  getnode()[fileName] = data.revese().join("\n")
-}
+things to add 
 
+1. mv ; to rename 
+2. tree ; to display the tree structure of system 
+3. touch ; to make files
+4. echo to print and write in file 
+5. history : gives history to cmds 
+6. chaining the cmds 
