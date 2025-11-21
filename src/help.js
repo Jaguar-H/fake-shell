@@ -7,4 +7,5 @@ export const commands = {
   cat: "Read and display the full contents of a file.",
   run : "runs the programs and games in the system . Use 'run program Name' ",
   rm: "Delete a file or directory. Use 'rm <name>'.",
+  quit: "to quit the shell"
 };

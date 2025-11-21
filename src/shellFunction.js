@@ -1,5 +1,7 @@
-import { fs } from "./fileSystem.js";
+import {decode } from "../encodeObject.js";
 import { commands } from "./help.js";
+
+export const fs = decode(Deno.readTextFileSync("./src/fileSystem.txt"));
 
 const path = [];
 
@@ -21,12 +23,6 @@ export const cd = (name) => {
   path.push(name);
 };
 
-export const run = (func) => {
-  const node = getNode()[func];
-  if (isFunction(node)) return node();
-  console.log(func, "is not a function to run");
-};
-
 export const mkdir = (name) => {
   const cur = getNode();
   if (cur[name]) return console.log("already exists");
@@ -34,6 +30,10 @@ export const mkdir = (name) => {
 };
 
 export const mkfile = (name) => {
+  if(!name){
+    console.log("file name can't be empty !!!");
+    return;
+  }
   const cur = getNode();
   if (cur[name]) return console.log(`\n\n${name} already exists`);
 
@@ -80,3 +80,5 @@ export const rm = (name) => {
   delete curr[name];
   console.log(name, "\n succesFully deleted\n");
 };
+
+
